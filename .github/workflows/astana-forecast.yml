@@ -1,0 +1,64 @@
+# Scheduled pipeline: downloads the real daily weather history of Astana from
+# Open-Meteo, runs the full analysis and forecast, and publishes the results
+# as a job summary and a downloadable artifact.
+name: Astana forecast
+
+on:
+  schedule:
+    - cron: "17 6 2 * *" # 06:17 UTC on the 2nd of every month
+  workflow_dispatch:
+    inputs:
+      start:
+        description: "First day of the history (YYYY-MM-DD)"
+        default: "1994-01-01"
+      forecast_months:
+        description: "Months to forecast"
+        default: "24"
+
+permissions:
+  contents: read
+
+env:
+  MPLBACKEND: Agg
+  # Inputs are empty on scheduled runs, so fall back to the defaults.
+  START: ${{ inputs.start || '1994-01-01' }}
+  FORECAST_MONTHS: ${{ inputs.forecast_months || '24' }}
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install .
+      - name: Download Astana weather history
+        run: |
+          climate-analyzer fetch --city astana \
+            --start "$START" \
+            -o data/astana.csv
+      - name: Analyse temperature and forecast
+        run: |
+          climate-analyzer analyze data/astana.csv -c tavg -u "°C" \
+            --baseline 1994 2013 \
+            --forecast-months "$FORECAST_MONTHS" \
+            -o results/temperature
+      - name: Analyse precipitation
+        run: |
+          climate-analyzer analyze data/astana.csv -c prcp -u mm --outliers none \
+            --baseline 1994 2013 \
+            --forecast-months "$FORECAST_MONTHS" \
+            -o results/precipitation
+      - name: Publish report to the job summary
+        run: |
+          cat results/temperature/report.md >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          cat results/precipitation/report.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: astana-forecast-${{ github.run_number }}
+          path: |
+            data/astana.csv
+            results/
