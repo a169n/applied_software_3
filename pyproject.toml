@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "climate-analyzer"
+version = "0.1.0"
+description = "Clean weather station data and analyse long-term climate trends, anomalies and extremes."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Aibyn Talgatov", email = "a1byn.talgat05@gmail.com" }]
+requires-python = ">=3.10"
+keywords = ["climate", "weather", "time series", "trend analysis", "Mann-Kendall"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+ui = ["streamlit>=1.36"]
+dev = [
+    "climate-analyzer[ui]",
+    "pytest>=8",
+    "pytest-cov>=5",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "pandas-stubs",
+    "build",
+]
+
+[project.scripts]
+climate-analyzer = "climate_analyzer.cli:main"
+
+[project.urls]
+Repository = "https://github.com/a169n/applied_software_3"
+Issues = "https://github.com/a169n/applied_software_3/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"climate_analyzer.data" = ["*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = [
+    "error::FutureWarning",
+    "ignore::DeprecationWarning:streamlit.*",
+]
+
+[tool.coverage.run]
+source = ["climate_analyzer"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "NPY", "PD", "RUF"]
+ignore = ["RUF001"]  # en dashes in report text are intentional
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src", "app.py"]
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true
