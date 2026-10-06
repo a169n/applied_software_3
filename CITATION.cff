@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "climate-analyzer: weather data cleaning, climate trend analysis and forecasting"
+type: software
+authors:
+  - family-names: Talgatov
+    given-names: Aibyn
+    email: a1byn.talgat05@gmail.com
+version: 0.1.0
+date-released: 2026-10-06
+license: MIT
+repository-code: "https://github.com/a169n/applied_software_3"
+keywords:
+  - climate
+  - time series
+  - Mann-Kendall
+  - forecasting
+  - Astana

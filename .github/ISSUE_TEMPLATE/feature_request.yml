@@ -1,0 +1,20 @@
+name: Feature request
+description: Suggest a new analysis, data source or improvement
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What scientific question would this help answer?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Papers, standards (e.g. WMO guidelines) or tools describing the method.
