@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-ui = ["streamlit>=1.36"]
+ui = ["streamlit>=1.65.0"]
 dev = [
     "climate-analyzer[ui]",
     "pytest>=8",
