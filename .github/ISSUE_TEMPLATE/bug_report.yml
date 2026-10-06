@@ -1,0 +1,33 @@
+name: Bug report
+description: Something does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Include the command you ran or the steps in the web UI.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: data
+    attributes:
+      label: Input data
+      description: The first few lines of the CSV file, if relevant.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `climate-analyzer --version`
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: Windows 11, Python 3.12
