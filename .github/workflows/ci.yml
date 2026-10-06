@@ -62,7 +62,7 @@ jobs:
         run: pytest --cov --cov-report=term-missing --cov-report=xml --junitxml=junit.xml
       - name: Upload coverage and test results
         if: always() && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-report
           path: |
@@ -84,7 +84,7 @@ jobs:
         run: climate-analyzer analyze sample --baseline 1994 2013 -o results
       - name: Publish report to the job summary
         run: cat results/report.md >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: astana-sample-analysis
           path: results/
@@ -105,7 +105,7 @@ jobs:
           pip install dist/*.whl
           climate-analyzer --version
           climate-analyzer analyze sample --no-plots -o /tmp/check
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
