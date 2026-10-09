@@ -35,8 +35,9 @@ security fixes, so it is the minimum.
 | **pandas** | Time-indexed tables, resampling, rolling windows | Native support for date indexes, calendar-aware resampling (`MS`, `YS`) and missing values, which is exactly what daily weather series need. |
 | **NumPy** | Vectorised numerics, least squares | Foundation of the whole stack; `numpy.linalg.lstsq` fits the forecast model. |
 | **SciPy** | Statistical tests | Peer-reviewed implementations of `linregress`, `kendalltau` (Mann-Kendall) and `theilslopes` (Sen's slope). Writing these by hand would risk errors. |
-| **Matplotlib** | Figures | Publication-quality static images that work headless on CI (`Agg` backend). The object-oriented `Figure` API avoids global state. |
-| **Streamlit** | Minimal web UI | Turns a Python script into an interactive app in ~150 lines, without HTML or JavaScript. It ships `AppTest` for automated UI tests. Alternatives: Dash/Panel (more boilerplate), Flask + JS (much more code). |
+| **Matplotlib** | Figures written by the command line | Publication-quality static images that work headless on CI (`Agg` backend). The object-oriented `Figure` API avoids global state. |
+| **Streamlit** | Web UI | Turns one Python script into an interactive app without HTML or JavaScript; about half of `app.py` is explanatory text for non-specialist users. It ships `AppTest` for automated UI tests. Alternatives: Dash/Panel (more boilerplate), Flask + JS (much more code). |
+| **Plotly** | Interactive charts in the web UI | Hover values, zoom, a range slider and legend toggling work out of the box, and `st.plotly_chart` renders the figures natively. It is an optional dependency (the `ui` extra), so the library and the command line do not need it. Alternatives: Altair (already installed with Streamlit, but hover on line charts and shaded intervals need extra selection code for every chart), Bokeh (needs its own Streamlit component), Matplotlib (static images only). |
 | **urllib (stdlib)** | Download from Open-Meteo | One GET request does not need an extra dependency such as `requests`. |
 
 **Deliberately not used**
@@ -53,7 +54,7 @@ security fixes, so it is the minimum.
 
 | Option | Pros | Cons |
 |---|---|---|
-| **Open-Meteo (ERA5)** | free, no API key, any coordinates, continuous daily data from 1940 | reanalysis (~25 km grid), not a single station |
+| **Open-Meteo (ERA5 / ECMWF IFS)** | free, no API key, any coordinates, continuous daily data from 1940 | model grid cell, not a single station; the underlying model changes in 2017 |
 | Meteostat | real station data | gaps, bulk endpoint changes |
 | NOAA GHCN-Daily | authoritative station archive | large files, station-specific formats |
 | Kazhydromet | official national source | no open machine-readable API |

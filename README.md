@@ -192,7 +192,7 @@ model beats climatology by about 9 % in mean absolute error.
 │   ├── cli.py                     # command line interface
 │   └── data/astana_daily_sample.csv
 ├── scripts/generate_sample_data.py
-├── tests/                         # pytest suite (84 tests, ~98 % coverage)
+├── tests/                         # pytest suite (84 tests, ~99 % coverage)
 ├── docs/TECHNOLOGY.md             # justification of the chosen technologies
 └── .github/                       # CI/CD workflows, issue and PR templates, Dependabot
 ```
@@ -223,8 +223,11 @@ ruff check . && ruff format --check . && mypy && pytest --cov
   contains deliberate defects (gaps, sensor spikes, `-999` codes) so that the
   cleaning step can be tested. Regenerate it with
   `python scripts/generate_sample_data.py`. Use `fetch` for real data.
-- Open-Meteo data is **ERA5 reanalysis** on a grid of about 25 km. It
-  describes the city area, not a single weather station.
+- Open-Meteo data comes from weather models, not from a station. With the
+  default settings the archive uses the **ERA5 and ERA5-Land reanalyses** up
+  to 2016 and the operational **ECMWF IFS** model from 2017. It describes a
+  grid cell around the city, and the change of model can create an artificial
+  step in a long series (it is visible in the precipitation totals).
 - The forecast is **statistical**: it extrapolates the trend, the seasonal
   cycle and short-term persistence. It cannot predict individual weather
   events and is no substitute for a numerical weather model.

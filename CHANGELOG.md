@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-10-06
+## [0.1.0] - 2026-10-09
 
 ### Added
 - CSV loader with automatic date column detection and sentinel handling.
@@ -16,7 +16,9 @@ All notable changes to this project are documented here. The format follows
 - Forecasting model (trend + annual harmonics + AR(1)) with hold-out backtest
   against climatology.
 - Open-Meteo downloader for Astana and other cities (`climate-analyzer fetch`).
-- Command line interface, Streamlit web UI and Markdown/JSON reports.
+- Command line interface and Markdown/JSON reports.
+- Streamlit web UI with interactive Plotly charts, plain-language labels and an
+  explanation of every analysis.
 - Bundled synthetic Astana dataset (1994-2023) for offline tests and demos.
 - GitHub Actions: CI (lint, types, tests on 3 OSes), scheduled Astana forecast,
   tag-triggered release.
