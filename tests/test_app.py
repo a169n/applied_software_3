@@ -23,13 +23,15 @@ def test_app_runs_on_sample_data(app):
     assert not app.exception
     assert app.title[0].value == "Climate Analyzer"
     labels = [m.label for m in app.metric]
-    assert "Trend per decade" in labels
-    assert "Forecast skill" in labels
+    assert "Change per decade" in labels
+    assert "Forecast quality" in labels
     assert len(app.tabs) == 7
+    # annual + daily, forecast, anomalies, climatology, decomposition, extremes
+    assert len(app.get("plotly_chart")) == 7
 
 
 def test_app_switches_to_precipitation(app):
-    variable = next(s for s in app.sidebar.selectbox if s.label == "Variable")
+    variable = next(s for s in app.sidebar.selectbox if s.label == "What do you want to look at?")
     variable.select("prcp").run()
     assert not app.exception
     units = next(t for t in app.sidebar.text_input if t.label == "Units")

@@ -25,6 +25,62 @@ It is usable as a command line tool, a minimal web UI and a Python library.
 | **Model & forecast** | Trend + annual harmonics + AR(1) model, forecasts with 95 % prediction intervals, and a hold-out backtest scored against the climatology baseline. |
 | **Report** | Markdown and JSON reports, CSV tables and PNG figures. |
 
+## How it works
+
+The command line, the web UI and the Python API are three thin front ends over
+one function, `run_analysis()` in [`pipeline.py`](src/climate_analyzer/pipeline.py).
+They only differ in where the data comes from and how the result is shown, so
+all three always produce the same numbers.
+
+```mermaid
+flowchart LR
+    subgraph Input
+        A1[CSV file] --> L[io.py<br>load + validate]
+        A2[Open-Meteo] --> S[sources.py<br>download] --> L
+        A3[Bundled sample] --> L
+    end
+    L --> C[cleaning.py<br>remove outliers,<br>fill short gaps]
+    C --> R[analysis.py<br>monthly + yearly values]
+    R --> T[Trend, anomalies,<br>climatology,<br>decomposition, extremes]
+    R --> F[forecast.py<br>fit model, forecast,<br>backtest]
+    T --> X[AnalysisResult]
+    F --> X
+    X --> O1[CLI: report.md, summary.json,<br>CSV tables, PNG figures]
+    X --> O2[Web UI: interactive charts<br>and explanations]
+    X --> O3[Python: result object]
+```
+
+One run goes through these stages:
+
+1. **Load.** The data becomes a table with one row per day and one column per
+   variable (`tavg`, `tmin`, `tmax`, `prcp`, or whatever your CSV contains).
+   Placeholder codes such as `-999` become missing values, and duplicate or
+   unsorted dates are fixed.
+2. **Clean.** One variable is picked. Values that are impossible for their
+   calendar month are removed, and gaps of up to 3 days are filled by drawing
+   a straight line between the neighbouring days. Longer gaps stay empty. A
+   cleaning report records how many values were removed and filled.
+3. **Aggregate.** Daily values are combined into monthly and yearly values:
+   averaged for temperature, summed for precipitation. A month or year with
+   less than 80 % of its days is dropped instead of being estimated.
+4. **Analyse.** The yearly values give the long-term trend and its
+   significance, and the difference of each year from the baseline period.
+   The monthly values give the typical year (climatology) and the split into
+   trend, seasonal pattern and remainder. The daily values give the count of
+   unusually warm and cold days per year.
+5. **Forecast.** A model made of a straight-line trend, a repeating yearly
+   wave and a one-month memory term is fitted to the monthly values and
+   extended into the future with a 95 % range. To check it, the same model is
+   fitted again without the most recent 36 months and scored on how well it
+   predicts them, compared with simply guessing the usual value for each month.
+6. **Report.** Everything is collected in one `AnalysisResult`. The CLI writes
+   it to files, the web UI draws it as interactive charts, and library users
+   get the object itself.
+
+A stage that cannot run (for example, too few years for a trend or a forecast)
+is skipped with a warning in the report, and the rest of the analysis still
+completes. The formulas behind each stage are in [Methods](#methods).
+
 ## Quick start
 
 ```bash
@@ -70,9 +126,11 @@ streamlit run app.py
 ```
 
 In the sidebar, pick the offline Astana sample, the real Astana data from
-Open-Meteo, or upload your own CSV. Then adjust the cleaning, baseline and
-forecast settings. Each analysis has its own tab, and the report can be
-downloaded.
+Open-Meteo, or upload your own CSV. Then adjust the baseline and forecast
+settings (cleaning options are under *Advanced settings*). Each analysis has
+its own tab with an interactive Plotly chart (hover, zoom, toggle series) and a
+plain-language explanation of what it shows and how it is calculated. The
+report can be downloaded.
 
 ### Python library
 
@@ -122,7 +180,7 @@ model beats climatology by about 9 % in mean absolute error.
 ## Project structure
 
 ```
-├── app.py                         # Streamlit web UI
+├── app.py                         # Streamlit web UI (interactive Plotly charts)
 ├── src/climate_analyzer/
 │   ├── io.py                      # CSV loading and validation
 │   ├── sources.py                 # Open-Meteo downloader
@@ -130,7 +188,7 @@ model beats climatology by about 9 % in mean absolute error.
 │   ├── analysis.py                # trends, climatology, decomposition, extremes
 │   ├── forecast.py                # statistical model, forecast, backtest
 │   ├── pipeline.py                # end-to-end analysis + reports
-│   ├── plotting.py                # matplotlib figures
+│   ├── plotting.py                # matplotlib figures (CLI output)
 │   ├── cli.py                     # command line interface
 │   └── data/astana_daily_sample.csv
 ├── scripts/generate_sample_data.py
